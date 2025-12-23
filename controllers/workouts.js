@@ -18,14 +18,14 @@ workoutRouter.get('/all' , async(request , response, next)=>{
     }
     catch(error){next(error)}
 })
-/*
+
 workoutRouter.get('/:id' , async(request , response , next)=>{
     try{
         const workout = await Workout.findById(request.params.id)
         return response.json(workout)
     }
     catch(error){next(error)}
-}) */
+})
 workoutRouter.post('/' , async(request , response , next)=>{
     try{
         const body = request.body
