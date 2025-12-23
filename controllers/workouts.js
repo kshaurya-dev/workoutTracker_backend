@@ -10,7 +10,7 @@ const getTokenFrom = request => {
     }
     return null
 }
-workoutRouter.get('/' , async(request , response, next)=>{
+workoutRouter.get('/all' , async(request , response, next)=>{
     try{
         const workouts = await Workout.find({})
        .populate('user', {username:1 , name:1})
@@ -18,13 +18,14 @@ workoutRouter.get('/' , async(request , response, next)=>{
     }
     catch(error){next(error)}
 })
+/*
 workoutRouter.get('/:id' , async(request , response , next)=>{
     try{
         const workout = await Workout.findById(request.params.id)
         return response.json(workout)
     }
     catch(error){next(error)}
-})
+}) */
 workoutRouter.post('/' , async(request , response , next)=>{
     try{
         const body = request.body
@@ -42,6 +43,7 @@ workoutRouter.post('/' , async(request , response , next)=>{
             exercises: body.exercises,
             duration:body.duration,
             date:body.date,
+            note:body.note,
             user: user._id
         })
 
@@ -52,12 +54,55 @@ workoutRouter.post('/' , async(request , response , next)=>{
     }
     catch(error) {next(error)}
 })
+
+workoutRouter.get('/'  , async(request , response , next)=>{
+    try{
+        const body = request.body
+        const decodedToken = jwt.verify(getTokenFrom(request) , process.env.SECRET)
+
+        if (!decodedToken.id){
+            return response.status(401).json({error : 'token invalids'})
+        }
+        const user = await User.findById(decodedToken.id)
+
+        if(!user){
+        return response.status(400).json({error:'userID missing or  invalid'})} 
+
+        const workouts = await Workout.find({user : user._id})
+        response.json(workouts)
+    }
+    catch(error){
+        next(error)
+    }
+})
 workoutRouter.delete('/:id' ,async(request , response , next)=>{
    try{
-    await Workout.findByIdAndDelete(request.params.id)
+    const body = request.body
+    //console.log(body)
+    const decodedToken = jwt.verify(getTokenFrom(request) , process.env.SECRET)
+
+    if (!decodedToken.id){
+        return response.status(401).json({error : 'token invalids'})
+    }
+    const user = await User.findById(decodedToken.id)
+
+    if(!user){
+        return response.status(400).json({error:'userID missing or  invalid'})} 
+
+    const workout = await Workout.findById(request.params.id)
+
+    console.log('id of workout to be deleted : ', request.params.id)
+    console.log('name of workout being delted : ' , workout.name)
+    console.log('user sending request to delete ' , user.name)
+
+    if(workout.user.toString() !== user._id.toString()){
+        return response.status(403).json({error : 'not authorized'})
+    }
+    await workout.deleteOne()
+    console.log("and it was deleted ! ")
     response.status(204).end()
 }
-   catch(error){next(error)}
+  catch(error){next(error)}
 })
 
 workoutRouter.put('/:id' , async(request , response , next)=>{

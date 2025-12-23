@@ -13,7 +13,7 @@ mongoose.connect(url)
     console.log('some error occured : ', error.message)
 })
 const setSchema = new mongoose.Schema({
-    setNumber:{ required : true , type : Number},
+    //setNumber:{ required : true , type : Number},
     reps : { required : true , type:Number },
     weight :{ required:true , type:Number }
 })
@@ -27,6 +27,7 @@ const workoutSchema = new mongoose.Schema({
     exercises : [ exerciseSchema],
     date:{ required : true , type : Date },
     duration: { required:true, type : Number },
+    note:{type:String},
     user :{
         type: mongoose.Schema.Types.ObjectId,
         ref:'User'
