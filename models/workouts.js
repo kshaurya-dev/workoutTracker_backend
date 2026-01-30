@@ -18,7 +18,8 @@ const setSchema = new mongoose.Schema({
     weight :{ required:true , type:Number }
 })
 const exerciseSchema = new mongoose.Schema({
-    name:{required: true,type:String},
+    exercise_id:{required: true,type:String},
+    name:{required:true , type:String},
     sets:[setSchema]
 })
 
