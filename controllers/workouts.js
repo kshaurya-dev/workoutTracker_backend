@@ -31,18 +31,20 @@ workoutRouter.post('/' , async(request , response , next)=>{
         if(!user){
         return response.status(400).json({error:'userID missing or  invalid'})} 
 
+        console.log("BODY EXERCISES:", body.exercises)
         const workout = new Workout({
             name : body.name , 
             exercises: body.exercises,
             duration:body.duration,
             date:body.date,
-            note:body.note,
+            notes:body.notes,
             user: user._id
         })
 
         const savedWorkout = await workout.save()
         user.workouts=user.workouts.concat(savedWorkout._id)
         await user.save()
+        console.log("SAVED EXERCISES:", savedWorkout.exercises)
         response.status(201).json(savedWorkout)
     }
     catch(error) {next(error)}
